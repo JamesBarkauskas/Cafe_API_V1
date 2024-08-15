@@ -9,6 +9,8 @@ namespace CafeAPI
         public MappingConfig()
         {
             CreateMap<Food, FoodDTO>().ReverseMap();
+            CreateMap<Food, FoodCreateDTO>().ReverseMap();
+            CreateMap<Food, FoodUpdateDTO>().ReverseMap();
         }
     }
 }

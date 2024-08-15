@@ -4,6 +4,7 @@ using CafeAPI.Models.Dto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace CafeAPI.Controllers
 {
@@ -21,10 +22,10 @@ namespace CafeAPI.Controllers
 
         [HttpGet]
         [ProducesResponseType(200)]
-        public ActionResult<Food> GetFoods()
+        public async Task<ActionResult<Food>> GetFoods()
         {
-
-            IEnumerable<Food> foods_list = _db.Foods.ToList<Food>();
+            IEnumerable<Food> foods_list = await _db.Foods.ToListAsync();
+            // IEnumerable<Food> foods_list = _db.Foods.ToList<Food>();
             //IEnumerable<FoodDTO> foods_list_dto = _mapper.Map<FoodDTO>(foods_list);
             //List<FoodDTO> foods_list_dto = new();
             //foreach(Food food in foods_list)
@@ -48,13 +49,13 @@ namespace CafeAPI.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public ActionResult<FoodDTO> GetFood(int id)
+        public async Task<ActionResult<FoodDTO>> GetFood(int id)
         {
             if (id == 0)
             {
                 return BadRequest();
             }
-            var food = _db.Foods.FirstOrDefault(u => u.Id == id);
+            var food = await _db.Foods.FirstOrDefaultAsync(u => u.Id == id);
             if (food == null)
             {
                 return NotFound();
@@ -66,9 +67,9 @@ namespace CafeAPI.Controllers
         [HttpPost]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public ActionResult<FoodDTO> CreateFood([FromBody]FoodDTO food)
+        public async  Task<ActionResult<FoodDTO>> CreateFood([FromBody]FoodCreateDTO food)
         {
-            if (food == null || food.Id != 0)
+            if (food == null)
             {
                 return BadRequest();
             }
@@ -85,8 +86,8 @@ namespace CafeAPI.Controllers
 
 
             
-            _db.Foods.Add(_mapper.Map<Food>(food));
-            _db.SaveChanges();
+            await _db.Foods.AddAsync(_mapper.Map<Food>(food));
+            await _db.SaveChangesAsync();
             return Ok(food);
 
         }
@@ -95,7 +96,7 @@ namespace CafeAPI.Controllers
         //[ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public IActionResult DeleteFood(int id)
+        public async Task<IActionResult> DeleteFood(int id)
         {
             if (id == 0)
             {
@@ -108,12 +109,12 @@ namespace CafeAPI.Controllers
             }
 
             _db.Foods.Remove(food_item);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
             return NoContent();
         }
 
         [HttpPut]
-        public IActionResult UpdateFood(int id, [FromBody]FoodDTO food)
+        public async Task<IActionResult> UpdateFood(int id, [FromBody]FoodUpdateDTO food)
         {
             if (food.Id != id || food == null)
             {
@@ -122,7 +123,7 @@ namespace CafeAPI.Controllers
 
             Food model = _mapper.Map<Food>(food);
             _db.Update(model);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
 
             return Ok(food);
         }
