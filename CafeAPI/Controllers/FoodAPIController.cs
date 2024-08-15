@@ -1,7 +1,9 @@
 ﻿using CafeAPI.Data;
+using CafeAPI.Models;
 using CafeAPI.Models.Dto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using AutoMapper;
 
 namespace CafeAPI.Controllers
 {
@@ -9,15 +11,37 @@ namespace CafeAPI.Controllers
     [ApiController]
     public class FoodAPIController : ControllerBase
     {
-        FoodStore foodStore = new FoodStore();
+        private readonly AppDbContext _db;
+        private readonly IMapper _mapper;
+        public FoodAPIController(AppDbContext db, IMapper mapper)
+        {
+            _db = db;
+            _mapper = mapper;
+        }
 
         [HttpGet]
         [ProducesResponseType(200)]
-        public ActionResult<FoodDTO> GetFoods()
+        public ActionResult<Food> GetFoods()
         {
 
-            IEnumerable<FoodDTO> foods_list = foodStore.FoodList;
-            return Ok(foods_list);
+            IEnumerable<Food> foods_list = _db.Foods.ToList<Food>();
+            //IEnumerable<FoodDTO> foods_list_dto = _mapper.Map<FoodDTO>(foods_list);
+            //List<FoodDTO> foods_list_dto = new();
+            //foreach(Food food in foods_list)
+            //{
+            //    FoodDTO food_dto = new()
+            //    {
+            //        Id = food.Id,
+            //        Name = food.Name,
+            //        Price = food.Price,
+            //        ImageUrl = food.ImageUrl,
+            //        Details = food.Details
+            //    };
+            //    foods_list_dto.Add(food_dto);
+            //}
+
+
+            return Ok(_mapper.Map<List<FoodDTO>>(foods_list));
         }
 
         [HttpGet("{id:int}", Name ="GetFood")]
@@ -30,13 +54,13 @@ namespace CafeAPI.Controllers
             {
                 return BadRequest();
             }
-            var food = foodStore.FoodList.FirstOrDefault(u => u.Id == id);
+            var food = _db.Foods.FirstOrDefault(u => u.Id == id);
             if (food == null)
             {
                 return NotFound();
             }
 
-            return Ok(food);
+            return Ok(_mapper.Map<FoodDTO>(food));
         }
 
         [HttpPost]
@@ -49,9 +73,21 @@ namespace CafeAPI.Controllers
                 return BadRequest();
             }
 
-            var new_food = food;
-            foodStore.FoodList.Add(new_food);
-            return Ok(new_food);
+            //Food model = new()
+            //{
+            //    Id = food.Id,
+            //    Name = food.Name,
+            //    Price = food.Price,
+            //    ImageUrl = food.ImageUrl,
+            //    Details = food.Details,
+            //    CreatedDate = DateTime.Now
+            //};
+
+
+            
+            _db.Foods.Add(_mapper.Map<Food>(food));
+            _db.SaveChanges();
+            return Ok(food);
 
         }
 
@@ -65,13 +101,14 @@ namespace CafeAPI.Controllers
             {
                 return BadRequest();
             }
-            var food_item = foodStore.FoodList.FirstOrDefault(u => u.Id == id);
+            var food_item = _db.Foods.FirstOrDefault(u => u.Id == id);
             if (food_item == null)
             {
                 return NotFound();
             }
 
-            foodStore.FoodList.Remove(food_item);
+            _db.Foods.Remove(food_item);
+            _db.SaveChanges();
             return NoContent();
         }
 
@@ -82,6 +119,10 @@ namespace CafeAPI.Controllers
             {
                 return BadRequest();
             }
+
+            Food model = _mapper.Map<Food>(food);
+            _db.Update(model);
+            _db.SaveChanges();
 
             return Ok(food);
         }
