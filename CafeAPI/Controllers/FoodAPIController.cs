@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using CafeAPI.Repository.IRepository;
 
 namespace CafeAPI.Controllers
 {
@@ -12,11 +13,13 @@ namespace CafeAPI.Controllers
     [ApiController]
     public class FoodAPIController : ControllerBase
     {
-        private readonly AppDbContext _db;
+        //private readonly AppDbContext _db;
+        private readonly IFoodRepository _dbFood;
         private readonly IMapper _mapper;
-        public FoodAPIController(AppDbContext db, IMapper mapper)
+        public FoodAPIController(IFoodRepository dbFood, IMapper mapper)
         {
-            _db = db;
+            //_db = db;
+            _dbFood = dbFood;
             _mapper = mapper;
         }
 
@@ -24,7 +27,7 @@ namespace CafeAPI.Controllers
         [ProducesResponseType(200)]
         public async Task<ActionResult<Food>> GetFoods()
         {
-            IEnumerable<Food> foods_list = await _db.Foods.ToListAsync();
+            IEnumerable<Food> foods_list = await _dbFood.GetAllAsync();
             // IEnumerable<Food> foods_list = _db.Foods.ToList<Food>();
             //IEnumerable<FoodDTO> foods_list_dto = _mapper.Map<FoodDTO>(foods_list);
             //List<FoodDTO> foods_list_dto = new();
@@ -57,7 +60,7 @@ namespace CafeAPI.Controllers
                 ModelState.AddModelError("ErrorMessages", "Id of " +id+ " does not exist.");
                 return BadRequest(ModelState);
             }
-            var food = await _db.Foods.FirstOrDefaultAsync(u => u.Id == id);
+            var food = await _dbFood.GetAsync(u => u.Id == id);
             if (food == null)
             {
                 ModelState.AddModelError("ErrorMessages", "Id of " + id + " does not exist.");
@@ -89,9 +92,10 @@ namespace CafeAPI.Controllers
             //};
 
 
-            
-            await _db.Foods.AddAsync(_mapper.Map<Food>(food));
-            await _db.SaveChangesAsync();
+
+            //await _db.Foods.AddAsync(_mapper.Map<Food>(food));
+            //await _db.SaveChangesAsync();
+            await _dbFood.CreateAsync(_mapper.Map<Food>(food));
             return Ok(food);
 
         }
@@ -100,26 +104,28 @@ namespace CafeAPI.Controllers
         //[ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> DeleteFood(int id)
+        public async Task<ActionResult<Food>> DeleteFood(int id)
         {
             if (id == 0)
             {
                 ModelState.AddModelError("ErrorMessages", "Id of 0 does not exist.");
                 return BadRequest(ModelState);
             }
-            var food_item = _db.Foods.FirstOrDefault(u => u.Id == id);
+            var food_item = _dbFood.GetAsync(u => u.Id == id);
             if (food_item == null)
             {
                 ModelState.AddModelError("ErrorMessages", "Id of " + id + " does not exist.");
                 return NotFound(ModelState);
             }
 
-            _db.Foods.Remove(food_item);
-            await _db.SaveChangesAsync();
+            await _dbFood.RemoveAsync(await food_item);     // unsure why I need to include 'await' before 'food_item' too...
+            //await _db.SaveChangesAsync();
             return NoContent();
         }
 
-        [HttpPut]
+        [HttpPut("{id:int}", Name ="UpdateFood")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
         public async Task<IActionResult> UpdateFood(int id, [FromBody]FoodUpdateDTO food)
         {
             if (food.Id != id || food == null)
@@ -129,8 +135,7 @@ namespace CafeAPI.Controllers
             }
 
             Food model = _mapper.Map<Food>(food);
-            _db.Update(model);
-            await _db.SaveChangesAsync();
+            await _dbFood.UpdateAsync(model);
 
             return Ok(food);
         }
