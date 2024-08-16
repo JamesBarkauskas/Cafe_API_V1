@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using CafeAPI.Repository.IRepository;
+using System.Net;
 
 namespace CafeAPI.Controllers
 {
@@ -16,18 +17,24 @@ namespace CafeAPI.Controllers
         //private readonly AppDbContext _db;
         private readonly IFoodRepository _dbFood;
         private readonly IMapper _mapper;
+        protected APIResponse _response;
         public FoodAPIController(IFoodRepository dbFood, IMapper mapper)
         {
             //_db = db;
             _dbFood = dbFood;
             _mapper = mapper;
+            _response = new();
         }
 
         [HttpGet]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<Food>> GetFoods()
+        public async Task<ActionResult<APIResponse>> GetFoods()
         {
             IEnumerable<Food> foods_list = await _dbFood.GetAllAsync();
+
+            _response.StatusCode = HttpStatusCode.OK;
+            _response.Result = _mapper.Map<List<FoodDTO>>(foods_list);
+
             // IEnumerable<Food> foods_list = _db.Foods.ToList<Food>();
             //IEnumerable<FoodDTO> foods_list_dto = _mapper.Map<FoodDTO>(foods_list);
             //List<FoodDTO> foods_list_dto = new();
@@ -45,7 +52,8 @@ namespace CafeAPI.Controllers
             //}
 
             //var foods_dto_list = _mapper.Map<List<FoodDTO>>(foods_list);
-            return Ok(_mapper.Map<List<FoodDTO>>(foods_list));
+
+            return Ok(_response);
             
         }
 
@@ -53,7 +61,7 @@ namespace CafeAPI.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<FoodDTO>> GetFood(int id)
+        public async Task<ActionResult<APIResponse>> GetFood(int id)
         {
             if (id == 0)
             {
@@ -67,13 +75,16 @@ namespace CafeAPI.Controllers
                 return NotFound(ModelState);
             }
 
-            return Ok(_mapper.Map<FoodDTO>(food));
+            _response.Result = _mapper.Map<FoodDTO>(food);
+            _response.StatusCode = HttpStatusCode.OK;
+
+            return Ok(_response);
         }
 
         [HttpPost]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<FoodDTO>> CreateFood([FromBody]FoodCreateDTO food)
+        public async Task<ActionResult<APIResponse>> CreateFood([FromBody]FoodCreateDTO food)
         {
             if (food == null)
             {
@@ -95,38 +106,46 @@ namespace CafeAPI.Controllers
 
             //await _db.Foods.AddAsync(_mapper.Map<Food>(food));
             //await _db.SaveChangesAsync();
+
             await _dbFood.CreateAsync(_mapper.Map<Food>(food));
-            return Ok(food);
+
+            _response.Result = food;
+            _response.StatusCode = HttpStatusCode.Created;
+
+            return Ok(_response);
 
         }
 
         [HttpDelete]
-        //[ProducesResponseType(200)]
+        [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<Food>> DeleteFood(int id)
+        public async Task<ActionResult<APIResponse>> DeleteFood(int id)
         {
             if (id == 0)
             {
                 ModelState.AddModelError("ErrorMessages", "Id of 0 does not exist.");
                 return BadRequest(ModelState);
             }
-            var food_item = _dbFood.GetAsync(u => u.Id == id);
+            var food_item = await _dbFood.GetAsync(u => u.Id == id);
             if (food_item == null)
             {
                 ModelState.AddModelError("ErrorMessages", "Id of " + id + " does not exist.");
                 return NotFound(ModelState);
             }
 
-            await _dbFood.RemoveAsync(await food_item);     // unsure why I need to include 'await' before 'food_item' too...
+            await _dbFood.RemoveAsync(food_item);     // unsure why I need to include 'await' before 'food_item' too.. **bc i didnt include 'await' before GetAsync above..
+
+            _response.StatusCode = HttpStatusCode.NoContent;
+
             //await _db.SaveChangesAsync();
-            return NoContent();
+            return Ok(_response);
         }
 
         [HttpPut("{id:int}", Name ="UpdateFood")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<IActionResult> UpdateFood(int id, [FromBody]FoodUpdateDTO food)
+        public async Task<ActionResult<APIResponse>> UpdateFood(int id, [FromBody]FoodUpdateDTO food)
         {
             if (food.Id != id || food == null)
             {
@@ -137,7 +156,9 @@ namespace CafeAPI.Controllers
             Food model = _mapper.Map<Food>(food);
             await _dbFood.UpdateAsync(model);
 
-            return Ok(food);
+            _response.StatusCode = HttpStatusCode.OK;
+
+            return Ok(_response);
         }
     }
 }
