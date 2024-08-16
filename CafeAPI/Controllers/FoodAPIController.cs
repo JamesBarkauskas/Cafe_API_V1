@@ -41,8 +41,9 @@ namespace CafeAPI.Controllers
             //    foods_list_dto.Add(food_dto);
             //}
 
-
+            //var foods_dto_list = _mapper.Map<List<FoodDTO>>(foods_list);
             return Ok(_mapper.Map<List<FoodDTO>>(foods_list));
+            
         }
 
         [HttpGet("{id:int}", Name ="GetFood")]
@@ -53,12 +54,14 @@ namespace CafeAPI.Controllers
         {
             if (id == 0)
             {
-                return BadRequest();
+                ModelState.AddModelError("ErrorMessages", "Id of " +id+ " does not exist.");
+                return BadRequest(ModelState);
             }
             var food = await _db.Foods.FirstOrDefaultAsync(u => u.Id == id);
             if (food == null)
             {
-                return NotFound();
+                ModelState.AddModelError("ErrorMessages", "Id of " + id + " does not exist.");
+                return NotFound(ModelState);
             }
 
             return Ok(_mapper.Map<FoodDTO>(food));
@@ -67,11 +70,12 @@ namespace CafeAPI.Controllers
         [HttpPost]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async  Task<ActionResult<FoodDTO>> CreateFood([FromBody]FoodCreateDTO food)
+        public async Task<ActionResult<FoodDTO>> CreateFood([FromBody]FoodCreateDTO food)
         {
             if (food == null)
             {
-                return BadRequest();
+                ModelState.AddModelError("ErrorMessages", "Food object cannot be null");
+                return BadRequest(ModelState);
             }
 
             //Food model = new()
@@ -100,12 +104,14 @@ namespace CafeAPI.Controllers
         {
             if (id == 0)
             {
-                return BadRequest();
+                ModelState.AddModelError("ErrorMessages", "Id of 0 does not exist.");
+                return BadRequest(ModelState);
             }
             var food_item = _db.Foods.FirstOrDefault(u => u.Id == id);
             if (food_item == null)
             {
-                return NotFound();
+                ModelState.AddModelError("ErrorMessages", "Id of " + id + " does not exist.");
+                return NotFound(ModelState);
             }
 
             _db.Foods.Remove(food_item);
@@ -118,7 +124,8 @@ namespace CafeAPI.Controllers
         {
             if (food.Id != id || food == null)
             {
-                return BadRequest();
+                ModelState.AddModelError("ErrorMessages", "Id of object must match id of parameter.");
+                return BadRequest(ModelState);
             }
 
             Food model = _mapper.Map<Food>(food);
