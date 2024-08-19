@@ -12,6 +12,7 @@ namespace CafeAPI.Data
         }
 
         public DbSet<Food> Foods { get; set; }
+        public DbSet<Drink> Drinks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
