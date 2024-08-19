@@ -14,6 +14,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 });
 
 builder.Services.AddScoped<IFoodRepository, FoodRepository>();
+builder.Services.AddScoped<IDrinkRepository, DrinkRepository>();
 
 // adding automapper to dep. inj.
 builder.Services.AddAutoMapper(typeof(MappingConfig));
