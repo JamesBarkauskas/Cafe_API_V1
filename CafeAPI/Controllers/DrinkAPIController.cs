@@ -100,7 +100,7 @@ namespace CafeAPI.Controllers
         }
 
         [HttpPut("{id:int}", Name = "UpdateDrink")]
-        [ProducesResponseType(200)]
+        [ProducesResponseType(200)] 
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
         public async Task<ActionResult<APIResponse>> UpdateDrink(int id, [FromBody]DrinkDTO drink)
