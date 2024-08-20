@@ -1,7 +1,19 @@
+using Cafe_Web;
+using Cafe_Web.Services;
+using Cafe_Web.Services.IServices;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// add automapper dep. inj.
+builder.Services.AddAutoMapper(typeof(MappingConfig));
+
+// register our FoodService..
+builder.Services.AddHttpClient<IFoodService, FoodService>();
+builder.Services.AddScoped<IFoodService, FoodService>();
+
 
 var app = builder.Build();
 
