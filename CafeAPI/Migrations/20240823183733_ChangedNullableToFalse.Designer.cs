@@ -4,6 +4,7 @@ using CafeAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CafeAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240823183733_ChangedNullableToFalse")]
+    partial class ChangedNullableToFalse
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -34,18 +37,22 @@ namespace CafeAPI.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Details")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
                     b.Property<string>("Size")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedDate")
@@ -68,12 +75,15 @@ namespace CafeAPI.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Details")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Price")
@@ -90,7 +100,7 @@ namespace CafeAPI.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2024, 8, 23, 13, 41, 16, 330, DateTimeKind.Local).AddTicks(9698),
+                            CreatedDate = new DateTime(2024, 8, 23, 13, 37, 33, 447, DateTimeKind.Local).AddTicks(1832),
                             Details = "Egg and Cheese",
                             ImageUrl = "",
                             Name = "Sandwich",
@@ -100,7 +110,7 @@ namespace CafeAPI.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedDate = new DateTime(2024, 8, 23, 13, 41, 16, 330, DateTimeKind.Local).AddTicks(9740),
+                            CreatedDate = new DateTime(2024, 8, 23, 13, 37, 33, 447, DateTimeKind.Local).AddTicks(1873),
                             Details = "Loaded Potato soup",
                             ImageUrl = "",
                             Name = "Soup",
@@ -110,7 +120,7 @@ namespace CafeAPI.Migrations
                         new
                         {
                             Id = 3,
-                            CreatedDate = new DateTime(2024, 8, 23, 13, 41, 16, 330, DateTimeKind.Local).AddTicks(9742),
+                            CreatedDate = new DateTime(2024, 8, 23, 13, 37, 33, 447, DateTimeKind.Local).AddTicks(1875),
                             Details = "Warm delicious muffin",
                             ImageUrl = "",
                             Name = "Muffin",

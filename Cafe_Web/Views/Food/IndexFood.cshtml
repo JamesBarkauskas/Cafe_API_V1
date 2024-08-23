@@ -35,8 +35,8 @@
                     <td>@((item.Price).ToString("c"))</td>
                     <td>@item.Details</td>
                     <td>
-                        <a asp-controller="Food" asp-action="UpdateFood" asp-route-foodId="@item.Id" class="btn btn-success"><i class="bi bi-pencil-square"></i>Update Item</a>
-                        <a asp-controller="Food" asp-action="DeleteFood" asp-route-foodId="@item.Id" class="btn btn-danger"><i class="bi bi-trash-fill"></i>Delete Item</a>
+                        <a asp-controller="Food" asp-action="UpdateFood" asp-route-foodId="@item.Id" class="btn btn-success"><i class="bi bi-pencil-square"></i> Update Item</a>
+                        <a asp-controller="Food" asp-action="DeleteFood" asp-route-foodId="@item.Id" class="btn btn-danger"><i class="bi bi-trash-fill"></i> Delete Item</a>
                     </td>
                 </tr>
             }

@@ -21,13 +21,33 @@ namespace Cafe_Web.Controllers
         public async Task<IActionResult> IndexFood()
         {
             List<FoodDTO> foods = new();
-            var response = await _foodService.GetAllAsync<APIResponse>();
+            var response = await _foodService.GetAllAsync<APIResponse>();   // call the api..
 
             if (response != null && response.IsSuccess)
             {
                 foods = JsonConvert.DeserializeObject<List<FoodDTO>>(Convert.ToString(response.Result));
             }
             return View(foods);
+        }
+
+        public async Task<IActionResult> CreateFood()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]  // should include when using POST method..?
+        public async Task<IActionResult> CreateFood(FoodCreateDTO dto)
+        {
+            if (ModelState.IsValid) // refers to the validations of the FoodCreateDTO model...
+            {
+                var response = await _foodService.CreateAsync<APIResponse>(dto);    // if modelstate is valid, call the api..
+                if (response != null && response.IsSuccess)
+                {
+                    return RedirectToAction("IndexFood");
+                }
+            }
+            return View(dto);
         }
     }
 }
