@@ -1,0 +1,45 @@
+﻿@model IEnumerable<Cafe_Web.Models.Dto.FoodDTO>
+<br/>
+
+<div class="container p-4 border">
+    <div class="row pb-2">
+        <div class="col">
+            <h1 class="text-primary">Food Menu</h1>
+        </div>
+        <div class="col text-end pt-1">
+            <a asp-controller="Food" asp-action="CreateFood" class="btn btn-outline-primary"><i class="bi bi-plus-square-fill"></i> Create New Food Item</a>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Price
+                </th>
+                <th>
+                    Details
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach(var item in Model)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@((item.Price).ToString("c"))</td>
+                    <td>@item.Details</td>
+                    <td>
+                        <a asp-controller="Food" asp-action="UpdateFood" asp-route-foodId="@item.Id" class="btn btn-success"><i class="bi bi-pencil-square"></i>Update Item</a>
+                        <a asp-controller="Food" asp-action="DeleteFood" asp-route-foodId="@item.Id" class="btn btn-danger"><i class="bi bi-trash-fill"></i>Delete Item</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

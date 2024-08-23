@@ -8,7 +8,7 @@ namespace Cafe_Web.Services
     public class FoodService : BaseService, IFoodService    // FoodService explicitly defines the methods.. BaseService is the generic methods..
     {
         private readonly IHttpClientFactory _clientFactory;
-        private string foodUrl;
+        private string foodUrl;                             // url to the api
 
         public FoodService(IHttpClientFactory clientFactory, IConfiguration configuration) : base(clientFactory)
         {
