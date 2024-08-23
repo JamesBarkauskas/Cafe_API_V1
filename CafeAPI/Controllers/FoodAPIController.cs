@@ -116,7 +116,7 @@ namespace CafeAPI.Controllers
 
         }
 
-        [HttpDelete]
+        [HttpDelete("{id:int}", Name ="DeleteFood")]    // must include id, name here...
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]

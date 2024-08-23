@@ -32,7 +32,7 @@ namespace Cafe_Web.Services
             return SendAsync<T>(new APIRequest()
             {
                 ApiType = SD.ApiType.DELETE,
-                Url = foodUrl + "api/foodAPI/" + id
+                Url = foodUrl + "/api/foodAPI/" + id
             });
         }
 
